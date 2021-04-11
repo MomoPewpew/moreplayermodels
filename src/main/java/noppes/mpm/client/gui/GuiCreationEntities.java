@@ -6,6 +6,24 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.text.translation.I18n;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import noppes.mpm.client.gui.util.GuiCustomScroll;
+import noppes.mpm.client.gui.util.GuiNpcButton;
+import noppes.mpm.client.gui.util.ICustomScrollListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import net.minecraft.client.Minecraft;
@@ -26,12 +44,12 @@ public class GuiCreationEntities extends GuiCreationScreenInterface implements I
 	private List<String> list;
 	private GuiCustomScroll scroll;
 	private boolean resetToSelected = true;
-	
+
 	public GuiCreationEntities(){
-        Map<String, Class<? extends Entity>> mapping = EntityList.NAME_TO_CLASS;
-        for(String name : mapping.keySet()){
-        	Class<? extends Entity> c = mapping.get(name);
+		for (EntityEntry ent : ForgeRegistries.ENTITIES.getValues()) {
+		      String name = ent.getName();
         	try {
+        		Class<? extends Entity> c = ent.getEntityClass();
         		if(EntityLiving.class.isAssignableFrom(c) && c.getConstructor(new Class[] {World.class}) != null && !Modifier.isAbstract(c.getModifiers())){
         			if(Minecraft.getMinecraft().getRenderManager().getEntityClassRenderObject(c) instanceof RenderLivingBase<?>)
         				data.put(name.toString(),c.asSubclass(EntityLivingBase.class));
@@ -40,7 +58,7 @@ public class GuiCreationEntities extends GuiCreationScreenInterface implements I
 				e.printStackTrace();
 			} catch (NoSuchMethodException e) {
 			}
-        } 
+        }
 		list = new ArrayList<String>(data.keySet());
 		list.add("Player");
 		Collections.sort(list,String.CASE_INSENSITIVE_ORDER);
@@ -69,7 +87,7 @@ public class GuiCreationEntities extends GuiCreationScreenInterface implements I
 	    	}
     	}
     	scroll.setSelected(selected);
-    	
+
     	if(resetToSelected){
     		scroll.scrollTo(scroll.getSelected());
     		resetToSelected = false;
