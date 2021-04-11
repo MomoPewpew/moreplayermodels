@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.entity.item.ModItems;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.obj.OBJLoader;
@@ -69,15 +68,6 @@ import noppes.mpm.client.model.ModelBipedAlt;
 import noppes.mpm.client.model.ModelPlayerAlt;
 
 public class ClientProxy extends CommonProxy{
-	public void preInit(FMLPreInitializationEvent event) {
-		OBJLoader.INSTANCE.addDomain(MorePlayerModels.MODID);
-		registerModel(ModItems.CerealModel);
-	}
-
-	public void registerModel(Item item) {
-		ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(MorePlayerModels.MODID + ";" + item.getUnlocalizedName().substring(5), "inventory"));
-	}
-
 	public static KeyBinding Screen;
 	public static KeyBinding Sleep;
 	public static KeyBinding Sit;
@@ -85,16 +75,12 @@ public class ClientProxy extends CommonProxy{
 	public static KeyBinding Hug;
 	public static KeyBinding Crawl;
 	public static KeyBinding Camera;
-	
+
 	@Override
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world,
 			int x, int y, int z) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	public void init(FMLInitializationEvent event) {
-		ModItems.registerRenders();
 	}
 
 	@Override
@@ -111,7 +97,7 @@ public class ClientProxy extends CommonProxy{
 		ClientRegistry.registerKeyBinding(Camera = new KeyBinding("MPM Camera",Keyboard.KEY_LMENU, "key.categories.gameplay"));
 
 		FMLCommonHandler.instance().bus().register(new ClientEventHandler());
-		
+
 		if(MorePlayerModels.EnableUpdateChecker){
 			VersionChecker checker = new VersionChecker();
 			checker.start();
@@ -134,10 +120,10 @@ public class ClientProxy extends CommonProxy{
 	@Override
 	public void postload() {
 		FixModels(true);
-		
+
         if(MorePlayerModels.InventoryGuiEnabled){
 	        MinecraftForge.EVENT_BUS.register(new TabRegistry());
-	        
+
 	        if (TabRegistry.getTabList().isEmpty()){
 	        	TabRegistry.registerTab(new InventoryTabVanilla());
 	        }
@@ -145,9 +131,9 @@ public class ClientProxy extends CommonProxy{
         }
 	}
 	public static void FixModels(boolean init){
-		
+
 		Map<String,RenderPlayer> map = ObfuscationReflectionHelper.getPrivateValue(RenderManager.class, Minecraft.getMinecraft().getRenderManager(), 1);
-		
+
 		for(String type : map.keySet()){
 			RenderPlayer render = map.get(type);
 			FixModels(render, type.equals("slim"), !init);
@@ -160,15 +146,15 @@ public class ClientProxy extends CommonProxy{
 				}
 			}
 			if(!hasMPMLayers)
-				addLayers(render);				
+				addLayers(render);
 		}
 	}
-	
+
 	private static void FixModels(RenderPlayer render, boolean slim, boolean fix){
 		if(!MorePlayerModels.Compatibility)
-			render.mainModel = new ModelPlayerAlt(0, slim);
+			render.mainModel = new ModelPlayerAlt(0.0F, slim);
 		else if(fix)
-			render.mainModel = new ModelPlayer(0, slim);
+			render.mainModel = new ModelPlayer(0.0F, slim);
 
 		Iterator<? extends LayerRenderer> ita = render.layerRenderers.iterator();
 		while(ita.hasNext()){
@@ -187,32 +173,27 @@ public class ClientProxy extends CommonProxy{
 			if(layer instanceof LayerCustomHead){
 				ObfuscationReflectionHelper.setPrivateValue(LayerCustomHead.class, (LayerCustomHead)layer, render.getMainModel().bipedHead, 0);
 			}
-			if(layer instanceof LayerElytra){
-				ita.remove();				
-			}
+			if (layer instanceof net.minecraft.client.renderer.entity.layers.LayerElytra)
+				ita.remove();
 		}
-		render.layerRenderers.add(new LayerElytraAlt(render));
+		LayerElytraAlt layerElytraAlt = new LayerElytraAlt(render);
+		render.layerRenderers.add(layerElytraAlt);
 	}
-	
-	private static void addLayers(RenderPlayer render){
-		List<LayerRenderer<AbstractClientPlayer>> list = render.layerRenderers;
-		Iterator<? extends LayerRenderer> it = list.iterator();
-		while(it.hasNext()){
-			LayerRenderer layer = it.next();
-			if(layer instanceof LayerCape)
-				it.remove();
-		}
-		list.add(new LayerEyes(render));
-		list.add(new LayerHead(render));
-		list.add(new LayerBody(render));
-		list.add(new LayerArms(render));
-		list.add(new LayerLegs(render));
-		list.add(new LayerHeadwear(render));
-		list.add(new LayerCapeMPM(render));
-		list.add(new LayerChatbubble(render));
-		list.add(new LayerBackItem(render));
+
+	private static void addLayers(RenderPlayer playerRender){
+		List<LayerRenderer<AbstractClientPlayer>> list = playerRender.layerRenderers;
+	    list.removeIf(layer -> layer instanceof net.minecraft.client.renderer.entity.layers.LayerCape);
+	    list.add(1, new LayerEyes(playerRender));
+	    list.add(2, new LayerHead(playerRender));
+	    list.add(3, new LayerBody(playerRender));
+	    list.add(4, new LayerArms(playerRender));
+	    list.add(5, new LayerLegs(playerRender));
+	    list.add(6, new LayerHeadwear(playerRender));
+	    list.add(new LayerCapeMPM(playerRender));
+	    list.add(new LayerChatbubble(playerRender));
+	    list.add(new LayerBackItem(playerRender));
 	}
-	
+
 	public static void bindTexture(ResourceLocation location){
 		if(location == null)
 			return;
@@ -223,6 +204,6 @@ public class ClientProxy extends CommonProxy{
     		manager.loadTexture(location, ob);
     	}
         GlStateManager.bindTexture(ob.getGlTextureId());
-        
+
 	}
 }

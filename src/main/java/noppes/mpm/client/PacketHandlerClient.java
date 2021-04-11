@@ -28,7 +28,7 @@ public class PacketHandlerClient extends PacketHandlerServer{
 		try {
 			en = EnumPackets.values()[buf.readInt()];
 			handlePacket(buf, player, en);
-		
+
 		} catch (Exception e) {
 			LogWriter.error("Packet error: " + en, e);
 		}
@@ -85,7 +85,7 @@ public class PacketHandlerClient extends PacketHandlerServer{
 			if(pl == null)
 				return;
 			NBTTagCompound compound = Server.readNBT(buffer);
-			ItemStack item = ItemStack.loadItemStackFromNBT(compound);
+		    ItemStack item = new ItemStack(compound);
 			ModelData data = ModelData.get(pl);
 			data.backItem = item;
 		}
@@ -124,7 +124,7 @@ public class PacketHandlerClient extends PacketHandlerServer{
 			data.setAnimation(buffer.readInt());
 			data.animationStart = pl.ticksExisted;
 		}
-		
+
 	}
 
 }
