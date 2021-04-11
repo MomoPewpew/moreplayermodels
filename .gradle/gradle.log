@@ -1,8 +1,10 @@
 This mapping 'snapshot_20160518' was designed for MC 1.9.4! Use at your own peril.This mapping 'snapshot_20160518' was designed for MC 1.9.4! Use at your own peril.
 
 Found AccessTransformer: mpm_at.cfg
-:wrapper UP-TO-DATE
+:init
+The build file 'build.gradle' already exists. Skipping build initialization.
+:init SKIPPED
 
 BUILD SUCCESSFUL
 
-Total time: 0.732 secs
+Total time: 1.069 secs
