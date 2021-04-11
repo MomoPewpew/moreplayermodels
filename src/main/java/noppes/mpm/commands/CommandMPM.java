@@ -5,21 +5,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.command.WrongUsageException;
-import net.minecraft.entity.EntityList;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import noppes.mpm.ModelData;
 import noppes.mpm.Server;
 import noppes.mpm.constants.EnumAnimation;
@@ -28,12 +29,12 @@ import noppes.mpm.constants.EnumPackets;
 public class CommandMPM extends MpmCommandInterface {
 	private HashMap<String,Class<? extends EntityLivingBase>> entities = new HashMap<String, Class<? extends EntityLivingBase>>();
 	private List<String> sub = Arrays.asList("url", "name", "entity", "scale", "animation", "sendmodel");
-		
+
 	public CommandMPM(){
-        Map<?,?> mapping = EntityList.NAME_TO_CLASS;
-        for(Object name : mapping.keySet()){
-        	Class<?> c = (Class<?>) mapping.get(name);
+        for (EntityEntry ent : ForgeRegistries.ENTITIES.getValues()) {
+        	String name = ent.getName();
         	try {
+        		Class<? extends Entity> c = ent.getEntityClass();
         		if(EntityLiving.class.isAssignableFrom(c) && c.getConstructor(new Class[] {World.class}) != null && !Modifier.isAbstract(c.getModifiers())){
         			entities.put(name.toString().toLowerCase(), c.asSubclass(EntityLivingBase.class));
         		}
@@ -41,10 +42,10 @@ public class CommandMPM extends MpmCommandInterface {
 				e.printStackTrace();
 			} catch (NoSuchMethodException e) {
 			}
-        } 
+        }
         entities.put("clear", null);
 	}
-	
+
 	@Override
 	public String getCommandName() {
 		return "mpm";
@@ -58,35 +59,35 @@ public class CommandMPM extends MpmCommandInterface {
 		String type = var2[0].toLowerCase();
 		if(!sub.contains(type)){
 			throw new CommandException("Unknown subcommand");
-		}		
+		}
 		var2 = Arrays.copyOfRange(var2, 1, var2.length);
-		
+
 		EntityPlayer player = null;
 		if(var2.length > 1 && isPlayerOp(icommandsender)){
 			try {
 				player = getPlayer(server, icommandsender, var2[0]);
 				var2 = Arrays.copyOfRange(var2, 1, var2.length);
 			} catch (PlayerNotFoundException e) {
-				
+
 			}
 		}
 		if(player == null && icommandsender instanceof EntityPlayer)
 			player = (EntityPlayer) icommandsender;
-		
+
 		if(player == null)
-			throw new PlayerNotFoundException();
+			throw new PlayerNotFoundException("commands.generic.player.notFound", new Object[] { icommandsender });
 
 		ModelData data = ModelData.get(player);
-		
+
 		if(type.equals("url")){
 			url(player, var2, data);
 		}
 		else if(type.equals("scale")){
 			scale(player, var2, data);
-		}		
+		}
 		else if(type.equals("name")){
 			name(player, var2, data);
-		}	
+		}
 		else if(type.equals("entity")){
 			entity(player, var2, data);
 		}
@@ -97,11 +98,11 @@ public class CommandMPM extends MpmCommandInterface {
 			sendmodel(server, player, var2, data);
 		}
 	}
-	
+
 	private void animation(EntityPlayer player, String[] var2, ModelData data) throws WrongUsageException {
 		if(var2.length <= 0)
 			throw new WrongUsageException("/mpm animation [@p] <animation>");
-		
+
 		String type = var2[0];
 		EnumAnimation animation = null;
 
@@ -111,23 +112,23 @@ public class CommandMPM extends MpmCommandInterface {
 				break;
 			}
 		}
-		
+
 		if(animation == null){
 			throw new WrongUsageException("Unknown animation " + type);
 		}
-		
+
 		if(data.animation == animation){
 			animation = EnumAnimation.NONE;
 		}
-		
+
 		Server.sendAssociatedData(player, EnumPackets.ANIMATION, player.getUniqueID(), animation);
 		data.setAnimation(animation);
 	}
-	
+
 	private void entity(EntityPlayer player, String[] var2, ModelData data) throws WrongUsageException {
 		if(var2.length <= 0)
 			throw new WrongUsageException("/mpm entity [@p] <entity> (to go back to default /mpm entity [@p] clear)");
-		
+
 		String arg = var2[0].toLowerCase();
 		if(!entities.containsKey(arg)){
 			throw new WrongUsageException("Unknown entity: " + var2[0]);
@@ -143,10 +144,10 @@ public class CommandMPM extends MpmCommandInterface {
 		    	i++;
 			}
 		}
-		
+
 		Server.sendAssociatedData(player, EnumPackets.SEND_PLAYER_DATA, player.getUniqueID(), data.writeToNBT());
 	}
-	
+
 	private void name(EntityPlayer player, String[] var2, ModelData data) throws WrongUsageException {
 		if(var2.length <= 0)
 			throw new WrongUsageException("/mpm name [@p] <name>");
@@ -177,35 +178,34 @@ public class CommandMPM extends MpmCommandInterface {
 		data.url = url;
 		Server.sendAssociatedData(player, EnumPackets.SEND_PLAYER_DATA, player.getUniqueID(), data.writeToNBT());
 	}
-	
-	private void sendmodel(MinecraftServer server, EntityPlayer fromPlayer, String[] var2, ModelData fromData) throws WrongUsageException{
-		if(var2.length < 1){
+
+	private void sendmodel(MinecraftServer server, EntityPlayer fromPlayer, String[] args, ModelData fromData) throws WrongUsageException{
+		EntityPlayerMP entityPlayerMP = null;
+		if(args.length < 1){
 			throw new WrongUsageException("/mpm sendmodel [@from_player] <@to_player> (to go back to default /mpm sendmodel [@p] clear)");
 		}
-		
+
 		EntityPlayer toPlayer = null;
 		ModelData toData = null;
 
 		try {
-			toPlayer = getPlayer(server, fromPlayer, var2[0]);
-		} catch (PlayerNotFoundException e) {}
-				
-		if(toPlayer == null || toPlayer == fromPlayer){
-			if(var2[0].equalsIgnoreCase("clear")){
-				fromData = new ModelData();
-			}
-			else
-				throw new WrongUsageException("/mpm sendmodel [@from_player] <@to_player> (to go back to default /mpm sendmodel [@p] clear)");
-		}
-		else
-			toData = ModelData.get(toPlayer);
-		
-		NBTTagCompound compound = fromData.writeToNBT();
-		toData.readFromNBT(compound);
-		toData.save();
-		Server.sendAssociatedData(toPlayer, EnumPackets.SEND_PLAYER_DATA, toPlayer.getUniqueID(), compound);
-	}
-	
+			entityPlayerMP = getPlayer(server, (ICommandSender)fromPlayer, args[0]);
+	    } catch (CommandException commandException) {}
+	    if (entityPlayerMP == null || entityPlayerMP == fromPlayer) {
+	      if (args[0].equalsIgnoreCase("clear")) {
+	        fromData = new ModelData();
+	      } else {
+	        throw new WrongUsageException("/mpm sendmodel [@from_player] <@to_player> (to go back to default /mpm sendmodel [@p] clear)", new Object[0]);
+	      }
+	    } else {
+	      toData = ModelData.get((EntityPlayer)entityPlayerMP);
+	    }
+	    NBTTagCompound compound = fromData.writeToNBT();
+	    toData.readFromNBT(compound);
+	    toData.save();
+	    Server.sendAssociatedData((Entity)entityPlayerMP, EnumPackets.SEND_PLAYER_DATA, new Object[] { entityPlayerMP.getUniqueID(), compound });
+	  }
+
 	private void scale(EntityPlayer player, String[] var2, ModelData data) throws WrongUsageException{
 		try{
 			if(var2.length == 1){
@@ -246,7 +246,7 @@ public class CommandMPM extends MpmCommandInterface {
 	public String getCommandUsage(ICommandSender icommandsender) {
 		return "/mpm <url/model/scale/name/animation> [@p]";
 	}
-	
+
 	@Override
     public int getRequiredPermissionLevel(){
         return 2;
@@ -276,7 +276,7 @@ public class CommandMPM extends MpmCommandInterface {
 
 	static class Scale{
 		float scaleX, scaleY, scaleZ;
-		
+
 		private static Scale Parse(String s) throws NumberFormatException{
 			Scale scale = new Scale();
 			if(s.contains(",")){
