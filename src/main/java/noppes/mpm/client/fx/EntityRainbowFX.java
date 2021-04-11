@@ -1,6 +1,9 @@
 package noppes.mpm.client.fx;
 
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.entity.Entity;
+import net.minecraft.world.World;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
@@ -32,12 +35,12 @@ public class EntityRainbowFX extends Particle
             0.5625F, 0, 1.0f
         }
     };
-    public EntityRainbowFX(World world, double d, double d1, double d2, 
+    public EntityRainbowFX(World world, double d, double d1, double d2,
             double f, double f1, double f2){
         this(world, d, d1, d2, 1.0F, f, f1, f2);
     }
 
-    public EntityRainbowFX(World world, double d, double d1, double d2, 
+    public EntityRainbowFX(World world, double d, double d1, double d2,
             float f, double f1, double f2, double f3){
         super(world, d, d1, d2, 0.0D, 0.0D, 0.0D);
         motionX *= 0.10000000149011612D;
@@ -59,7 +62,7 @@ public class EntityRainbowFX extends Particle
     }
 
     @Override
-    public void renderParticle(VertexBuffer tessellator, Entity entity, float f, float f1, float f2, float f3, float f4, float f5){
+    public void renderParticle(BufferBuilder tessellator, Entity entity, float f, float f1, float f2, float f3, float f4, float f5){
         float f6 = (((float)particleAge + f) / (float)particleMaxAge) * 32F;
         if(f6 < 0.0F){
             f6 = 0.0F;
