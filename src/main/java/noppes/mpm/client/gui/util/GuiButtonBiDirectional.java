@@ -10,26 +10,25 @@ public class GuiButtonBiDirectional extends GuiNpcButton{
 	public GuiButtonBiDirectional(int id, int x, int y, int width, int height, String[] arr, int current) {
 		super(id, x, y, width, height, arr, current);
 	}
-	
-    @Override
+
     public void drawButton(Minecraft mc, int mouseX, int mouseY){
         if (!this.visible)
         	return;
         boolean disabled = !this.enabled || display.length <= 1;
-        
+
         boolean hover = !disabled && mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
-        
+
         boolean hoverL = !disabled && mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + 11 && mouseY < this.yPosition + this.height;
 
         boolean hoverR = !disabled && !hoverL && mouseX >= this.xPosition + width - 11 && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
-        
+
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         mc.getTextureManager().bindTexture(resource);
 
         this.drawTexturedModalRect(this.xPosition, this.yPosition, 0, disabled?20:hoverL?40:0, 11, 20);
-        
+
         this.drawTexturedModalRect(this.xPosition + width - 11, this.yPosition, 11, disabled?20:hoverR?40:0, 11, 20);
-        
+
         int l = 0xffffff;
         if (packedFGColour != 0){
             l = packedFGColour;
@@ -55,10 +54,10 @@ public class GuiButtonBiDirectional extends GuiNpcButton{
         	text = displayString;
         if(hover)
         	text = (char)167 + "n" + text;
-        
+
         this.drawCenteredString(mc.fontRendererObj, text, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, l);
     }
-    
+
     @Override
     public boolean mousePressed(Minecraft minecraft, int mouseX, int mouseY){
     	int value = getValue();

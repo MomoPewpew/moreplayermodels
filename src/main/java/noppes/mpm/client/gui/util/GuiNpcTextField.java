@@ -12,9 +12,9 @@ public class GuiNpcTextField extends GuiTextField{
     public int id;
     public int min = 0,max = Integer.MAX_VALUE,def = 0;
     private static GuiNpcTextField activeTextfield = null;
-    
+
     private final int[] allowedSpecialChars = {14,211,203,205};
-	
+
 	public GuiNpcTextField(int id,GuiScreen parent, int i, int j, int k, int l, String s) {
 		super(id, Minecraft.getMinecraft().fontRendererObj, i, j, k, l);
 		setMaxStringLength(500);
@@ -23,21 +23,21 @@ public class GuiNpcTextField extends GuiTextField{
 		if(parent instanceof ITextfieldListener)
 			listener = (ITextfieldListener) parent;
 	}
-	
+
 	public static boolean isActive(){
 		return activeTextfield != null;
 	}
-	
+
 	private boolean charAllowed(char c, int i){
 		if(!numbersOnly || Character.isDigit(c))
 			return true;
 		for(int j : allowedSpecialChars)
 			if(j == i)
 				return true;
-		
+
 		return false;
 	}
-	
+
 	@Override
     public boolean textboxKeyTyped(char c, int i)
     {
@@ -60,19 +60,18 @@ public class GuiNpcTextField extends GuiTextField{
     		return false;
     	}
     }
-	@Override
-    public void mouseClicked(int i, int j, int k)
-    {
-    	boolean wasFocused = this.isFocused();
-    	super.mouseClicked(i, j, k);
-    	if(wasFocused != isFocused()){
-    		if(wasFocused){
-    			unFocused();
-    		}
-    	}
-    	if(isFocused())
-    		activeTextfield = this;
-    }
+
+	  public boolean mouseClicked(int i, int j, int k) {
+		    boolean wasFocused = isFocused();
+		    boolean clicked = super.mouseClicked(i, j, k);
+		    if (wasFocused != isFocused() &&
+		      wasFocused)
+		      unFocused();
+		    if (isFocused())
+		      activeTextfield = this;
+		    return clicked;
+		  }
+
 
 	public void unFocused(){
 		if(numbersOnly){
@@ -85,7 +84,7 @@ public class GuiNpcTextField extends GuiTextField{
 		}
 		if(listener != null)
 			listener.unFocused(this);
-		
+
 		if(this == activeTextfield)
 			activeTextfield = null;
 	}
@@ -105,5 +104,5 @@ public class GuiNpcTextField extends GuiTextField{
 		activeTextfield = null;
 	}
 
-	
+
 }

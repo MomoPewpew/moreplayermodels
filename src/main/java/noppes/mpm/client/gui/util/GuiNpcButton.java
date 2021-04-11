@@ -6,7 +6,7 @@ import net.minecraft.util.text.translation.I18n;
 
 public class GuiNpcButton extends GuiButton{
 	public boolean shown = true;
-	
+
 	protected String[] display;
 	private int displayValue = 0;
 	public int id;
@@ -35,14 +35,14 @@ public class GuiNpcButton extends GuiButton{
 	public int getValue(){
 		return displayValue;
 	}
-	
-	@Override
-    public void drawButton(Minecraft minecraft, int i, int j)
+
+    public void drawButton(Minecraft minecraft, int i, int j, float partialTicks)
     {
     	if(!shown)
     		return;
-    	super.drawButton(minecraft, i, j);
+    	super.drawButton(minecraft, i, j, partialTicks);
     }
+
 	@Override
     public boolean mousePressed(Minecraft minecraft, int i, int j)
     {
@@ -55,6 +55,6 @@ public class GuiNpcButton extends GuiButton{
     }
     public void setDisplay(int value){
     	this.displayValue = value;
-    	this.setDisplayText(display[value]);
-    }    
+        setDisplayText(this.display[value]);
+    }
 }

@@ -2,15 +2,11 @@ package noppes.mpm.client.gui.util;
 
 import java.util.HashSet;
 import java.util.Vector;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSlot;
 
-
-public class GuiNPCStringSlot extends GuiSlot
-{
-
+public class GuiNPCStringSlot extends GuiSlot {
 	private Vector<String> list; /* synthetic field */
     public String selected;
     public HashSet<String> selectedList;
@@ -87,12 +83,17 @@ public class GuiNPCStringSlot extends GuiSlot
 	public void setList(Vector<String> list) {
 		this.list = list;
 	}
-	@Override
+
 	protected void drawSlot(int i, int j, int k, int p_180791_4_, int p_180791_5_, int p_180791_6_) {
     	if(i >= list.size())
     		return;
     	String s = list.get(i);
     	parent.drawString(Minecraft.getMinecraft().fontRendererObj, s, j + 50, k + 3, 0xFFFFFF);
-		
+
+	}
+	@Override
+	protected void func_192637_a(int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, float arg6) {
+		// TODO Auto-generated method stub
+
 	}
 }
