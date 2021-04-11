@@ -1,37 +1,36 @@
 package noppes.mpm.client.model;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 public class Model2DRenderer extends ModelRenderer {
 
     private boolean compiled;
 
     private int displayList;
-    
+
 	private float x1, x2, y1, y2;
 	private int width, height;
 	private float rotationOffsetX, rotationOffsetY, rotationOffsetZ;
-	
+
 	private float scaleX = 1, scaleY = 1, thickness = 1;
 
 	public Model2DRenderer(ModelBase par1ModelBase, float x, float y, int width, int height, int textureWidth, int textureHeight) {
 		super(par1ModelBase);
 		this.width = width;
 		this.height = height;
-		
+
 		this.textureWidth = textureWidth;
 		this.textureHeight = textureHeight;
-		
+
 		x1 = x / textureWidth;
 		y1 = y / textureHeight;
 
@@ -41,19 +40,19 @@ public class Model2DRenderer extends ModelRenderer {
 	public Model2DRenderer(ModelBase par1ModelBase, float x, float y, int width, int height) {
 		this(par1ModelBase, x, y, width, height, par1ModelBase.textureWidth, par1ModelBase.textureHeight);
 	}
-    
+
 	public void render(float par1) {
 		if(!showModel || isHidden)
 			return;
 		if(!compiled)
 			compileDisplayList(par1);
-		
+
 		GlStateManager.pushMatrix();
 		this.postRender(par1);
 		GlStateManager.callList(this.displayList);
 		GlStateManager.popMatrix();
 	}
-	
+
 	public void setRotationOffset(float x, float y, float z){
 		rotationOffsetX = x;
 		rotationOffsetY = y;
@@ -89,8 +88,8 @@ public class Model2DRenderer extends ModelRenderer {
         GL11.glEndList();
         this.compiled = true;
     }
-    
-    public static void renderItemIn2D(VertexBuffer worldrenderer, float p_78439_1_, float p_78439_2_, float p_78439_3_, float p_78439_4_, int p_78439_5_, int p_78439_6_, float p_78439_7_){
+
+    public static void renderItemIn2D(BufferBuilder worldrenderer, float p_78439_1_, float p_78439_2_, float p_78439_3_, float p_78439_4_, int p_78439_5_, int p_78439_6_, float p_78439_7_){
     	Tessellator tessellator = Tessellator.getInstance();
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_NORMAL);
         worldrenderer.pos(0.0D, 0.0D, 0.0D).tex(p_78439_1_, p_78439_4_).normal(0.0F, 0.0F, 1.0F).endVertex();
@@ -98,7 +97,7 @@ public class Model2DRenderer extends ModelRenderer {
         worldrenderer.pos(1.0D, 1.0D, 0.0D).tex(p_78439_3_, p_78439_2_).normal(0.0F, 0.0F, 1.0F).endVertex();
         worldrenderer.pos(0.0D, 1.0D, 0.0D).tex(p_78439_1_, p_78439_2_).normal(0.0F, 0.0F, 1.0F).endVertex();
         tessellator.draw();
-        
+
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_NORMAL);
         worldrenderer.pos(0.0D, 1.0D, 0.0F - p_78439_7_).tex(p_78439_1_, p_78439_2_).normal(0.0F, 0.0F, -1.0F).endVertex();
         worldrenderer.pos(1.0D, 1.0D, 0.0F - p_78439_7_).tex(p_78439_3_, p_78439_2_).normal(0.0F, 0.0F, -1.0F).endVertex();
