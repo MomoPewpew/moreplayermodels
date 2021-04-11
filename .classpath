@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/main/resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="con" path="org.eclipse.buildship.core.gradleclasspathcontainer"/>
+	<classpathentry kind="lib" path="build/tmp/deobfMcMCP/deobfed.jar"/>
+	<classpathentry kind="lib" path="build/tmp/deobfMcSRG/deobfed.jar"/>
+	<classpathentry kind="lib" path="gradle/wrapper/gradle-wrapper.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Marijn/.gradle/caches/modules-2/files-2.1/org.lwjgl.lwjgl/lwjgl/2.9.4-nightly-20150209/697517568c68e78ae0b4544145af031c81082dfe/lwjgl-2.9.4-nightly-20150209.jar" sourcepath="C:/Users/Marijn/.gradle/caches/modules-2/files-2.1/org.lwjgl.lwjgl/lwjgl/2.9.4-nightly-20150209/7da2cff65127b558a66e8e38456174161723d3a7/lwjgl-2.9.4-nightly-20150209-sources.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Marijn/.gradle/caches/modules-2/files-2.1/org.apache.logging.log4j/log4j-api/2.8.1/e801d13612e22cad62a3f4f3fe7fdbe6334a8e72/log4j-api-2.8.1.jar" sourcepath="C:/Users/Marijn/.gradle/caches/modules-2/files-2.1/org.apache.logging.log4j/log4j-api/2.8.1/a5edb6b8c77843c8be98e0cb1f875699e76ee122/log4j-api-2.8.1-sources.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Marijn/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/21.0/3a3d111be1be1b745edfa7d91678a12d7ed38709/guava-21.0.jar" sourcepath="C:/Users/Marijn/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/21.0/b9ed26b8c23fe7cd3e6b463b34e54e5c6d9536d5/guava-21.0-sources.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Marijn/.gradle/caches/modules-2/files-2.1/io.netty/netty-all/4.1.9.Final/97860965d6a0a6b98e7f569f3f966727b8db75/netty-all-4.1.9.Final.jar" sourcepath="C:/Users/Marijn/.gradle/caches/modules-2/files-2.1/io.netty/netty-all/4.1.9.Final/69b921f5e296428c88c2ea4418e630443a699b06/netty-all-4.1.9.Final-sources.jar">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="E:/Users/Marijn/workspace/moreplayermodels/.gradle/minecraft/forge-1.12.2-14.23.5.2836-PROJECT(Quark)-binpatched.jar"/>
+	<classpathentry kind="lib" path="E:/Users/Marijn/workspace/moreplayermodels/.gradle/minecraft/forge-1.12.2-14.23.5.2847-PROJECT(moreplayermodels)-binpatched.jar"/>
+	<classpathentry kind="lib" path="E:/Users/Marijn/workspace/moreplayermodels/.gradle/minecraft/forgeBin-1.12.2-14.23.5.2836-PROJECT(Quark).jar"/>
+	<classpathentry kind="lib" path="E:/Users/Marijn/workspace/moreplayermodels/.gradle/minecraft/forgeBin-1.12.2-14.23.5.2847-PROJECT(moreplayermodels).jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
