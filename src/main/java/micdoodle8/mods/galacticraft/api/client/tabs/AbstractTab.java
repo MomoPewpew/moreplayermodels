@@ -21,7 +21,6 @@ public abstract class AbstractTab extends GuiButton {
 		this.itemRender = FMLClientHandler.instance().getClient().getRenderItem();
 	}
 
-	@Override
 	public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
 		int newPotionOffset = TabRegistry.getPotionOffsetNEI();
 		if (newPotionOffset != this.potionOffsetLast) {

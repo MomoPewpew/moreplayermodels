@@ -3,6 +3,61 @@ package noppes.mpm.client;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import micdoodle8.mods.galacticraft.api.client.tabs.AbstractTab;
+import micdoodle8.mods.galacticraft.api.client.tabs.InventoryTabMPM;
+import micdoodle8.mods.galacticraft.api.client.tabs.InventoryTabVanilla;
+import micdoodle8.mods.galacticraft.api.client.tabs.TabRegistry;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.model.ModelBase;
+import net.minecraft.client.model.ModelBiped;
+import net.minecraft.client.model.ModelPlayer;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.entity.RenderPlayer;
+import net.minecraft.client.renderer.entity.layers.LayerArmorBase;
+import net.minecraft.client.renderer.entity.layers.LayerCustomHead;
+import net.minecraft.client.renderer.entity.layers.LayerRenderer;
+import net.minecraft.client.renderer.texture.ITextureObject;
+import net.minecraft.client.renderer.texture.SimpleTexture;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.command.ICommand;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
+import net.minecraftforge.client.ClientCommandHandler;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import noppes.mpm.CommonProxy;
+import noppes.mpm.MorePlayerModels;
+import noppes.mpm.client.commands.CommandBow;
+import noppes.mpm.client.commands.CommandCrawl;
+import noppes.mpm.client.commands.CommandCry;
+import noppes.mpm.client.commands.CommandDance;
+import noppes.mpm.client.commands.CommandHug;
+import noppes.mpm.client.commands.CommandNo;
+import noppes.mpm.client.commands.CommandPoint;
+import noppes.mpm.client.commands.CommandSit;
+import noppes.mpm.client.commands.CommandSleep;
+import noppes.mpm.client.commands.CommandWag;
+import noppes.mpm.client.commands.CommandWave;
+import noppes.mpm.client.commands.CommandYes;
+import noppes.mpm.client.layer.LayerArms;
+import noppes.mpm.client.layer.LayerBackItem;
+import noppes.mpm.client.layer.LayerBody;
+import noppes.mpm.client.layer.LayerCapeMPM;
+import noppes.mpm.client.layer.LayerChatbubble;
+import noppes.mpm.client.layer.LayerElytraAlt;
+import noppes.mpm.client.layer.LayerEyes;
+import noppes.mpm.client.layer.LayerHead;
+import noppes.mpm.client.layer.LayerHeadwear;
+import noppes.mpm.client.layer.LayerInterface;
+import noppes.mpm.client.layer.LayerLegs;
+import noppes.mpm.client.model.ModelBipedAlt;
+import noppes.mpm.client.model.ModelPlayerAlt;
+import java.util.List;
+import java.util.Map;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
@@ -150,35 +205,33 @@ public class ClientProxy extends CommonProxy{
 		}
 	}
 
-	private static void FixModels(RenderPlayer render, boolean slim, boolean fix){
-		if(!MorePlayerModels.Compatibility)
-			render.mainModel = new ModelPlayerAlt(0.0F, slim);
-		else if(fix)
-			render.mainModel = new ModelPlayer(0.0F, slim);
-
-		Iterator<? extends LayerRenderer> ita = render.layerRenderers.iterator();
-		while(ita.hasNext()){
-			LayerRenderer layer = ita.next();
-			if(layer instanceof LayerArmorBase){
-				LayerArmorBase l = (LayerArmorBase) layer;
-				if(!MorePlayerModels.Compatibility){
-					ObfuscationReflectionHelper.setPrivateValue(LayerArmorBase.class, l, new ModelBipedAlt(0.5f), 1);
-					ObfuscationReflectionHelper.setPrivateValue(LayerArmorBase.class, l, new ModelBipedAlt(1), 2);
-				}
-				else if(fix){
-					ObfuscationReflectionHelper.setPrivateValue(LayerArmorBase.class, l, new ModelBiped(0.5f), 1);
-					ObfuscationReflectionHelper.setPrivateValue(LayerArmorBase.class, l, new ModelBiped(1), 2);
-				}
-			}
-			if(layer instanceof LayerCustomHead){
-				ObfuscationReflectionHelper.setPrivateValue(LayerCustomHead.class, (LayerCustomHead)layer, render.getMainModel().bipedHead, 0);
-			}
-			if (layer instanceof net.minecraft.client.renderer.entity.layers.LayerElytra)
-				ita.remove();
-		}
-		LayerElytraAlt layerElytraAlt = new LayerElytraAlt(render);
-		render.layerRenderers.add(layerElytraAlt);
-	}
+	  private static void fixModels(RenderPlayer render, boolean slim, boolean fix) {
+		    if (!MorePlayerModels.Compatibility) {
+		      render.mainModel = (ModelBase)new ModelPlayerAlt(0.0F, slim);
+		    } else if (fix) {
+		      render.mainModel = (ModelBase)new ModelPlayer(0.0F, slim);
+		    }
+		    Iterator<? extends LayerRenderer> ita = render.layerRenderers.iterator();
+		    while (ita.hasNext()) {
+		      LayerRenderer layer = ita.next();
+		      if (layer instanceof LayerArmorBase) {
+		        LayerArmorBase l = (LayerArmorBase)layer;
+		        if (!MorePlayerModels.Compatibility) {
+		          ObfuscationReflectionHelper.setPrivateValue(LayerArmorBase.class, l, new ModelBipedAlt(0.5F), 1);
+		          ObfuscationReflectionHelper.setPrivateValue(LayerArmorBase.class, l, new ModelBipedAlt(1.0F), 2);
+		        } else if (fix) {
+		          ObfuscationReflectionHelper.setPrivateValue(LayerArmorBase.class, l, new ModelBiped(0.5F), 1);
+		          ObfuscationReflectionHelper.setPrivateValue(LayerArmorBase.class, l, new ModelBiped(1.0F), 2);
+		        }
+		      }
+		      if (layer instanceof LayerCustomHead)
+		        ObfuscationReflectionHelper.setPrivateValue(LayerCustomHead.class, layer, (render.getMainModel()).bipedHead, 0);
+		      if (layer instanceof net.minecraft.client.renderer.entity.layers.LayerElytra)
+		        ita.remove();
+		    }
+		    LayerElytraAlt layerElytraAlt = new LayerElytraAlt(render);
+		    render.layerRenderers.add(layerElytraAlt);
+		  }
 
 	private static void addLayers(RenderPlayer playerRender){
 		List<LayerRenderer<AbstractClientPlayer>> list = playerRender.layerRenderers;
