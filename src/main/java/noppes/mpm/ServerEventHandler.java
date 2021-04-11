@@ -1,5 +1,6 @@
 package noppes.mpm;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.MobEffects;
@@ -17,7 +18,6 @@ import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.PlaySoundAtEntityEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent.StartTracking;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import noppes.mpm.constants.EnumPackets;
 
@@ -33,7 +33,7 @@ public class ServerEventHandler {
 	private static final ResourceLocation goblin_death = new ResourceLocation("moreplayermodels:goblin.male.death");
 	private static final ResourceLocation goblin_hurt = new ResourceLocation("moreplayermodels:goblin.male.hurt");
 	private static final ResourceLocation goblin_attack = new ResourceLocation("moreplayermodels:goblin.male.attack");
-	
+
 	@SubscribeEvent
     public void onPlaySoundAtEntity(PlaySoundAtEntityEvent event){
     	if(!(event.getEntity() instanceof EntityPlayer) || event.getSound() == null || event.getSound() != SoundEvents.ENTITY_PLAYER_HURT)
@@ -108,21 +108,21 @@ public class ServerEventHandler {
 
 		float pitch = (player.getRNG().nextFloat() - player.getRNG().nextFloat()) * 0.2F + 1.0F;
 		player.worldObj.playSound(player, player.getPosition(), new SoundEvent(new ResourceLocation(sound)), SoundCategory.PLAYERS,  0.98765432123456789f, pitch);
-		
+
 	}
 
 	@SubscribeEvent
-	public void playerTracking(StartTracking event){
+	public void playerTracking(PlayerEvent.StartTracking event){
 		if(!(event.getTarget() instanceof EntityPlayer))
 			return;
 		EntityPlayer target = (EntityPlayer) event.getTarget();
 		EntityPlayerMP player = (EntityPlayerMP) event.getEntityPlayer();
-		
+
 		ModelData data = ModelData.get(target);
-		
+
 		//have to send it delayed because the client doesnt know the uuid yet when send directly
 		Server.sendDelayedData(player, EnumPackets.SEND_PLAYER_DATA, 100, target.getUniqueID(), data.writeToNBT());
-		ItemStack back = target.inventory.mainInventory[0];
+		ItemStack back = target.inventory.mainInventory.get(0);
 		if(back != null)
 			Server.sendDelayedData(player, EnumPackets.BACK_ITEM_UPDATE, 100, target.getUniqueID(), back.writeToNBT(new NBTTagCompound()));
 		else
@@ -136,11 +136,11 @@ public class ServerEventHandler {
 			event.setDisplayname(data.displayName);
 		}
 	}
-	
+
 	private static final ResourceLocation key = new ResourceLocation("moreplayermodels", "modeldata");
 	@SubscribeEvent
-	public void attach(AttachCapabilitiesEvent.Entity event){
-		if(event.getEntity() instanceof EntityPlayer)
-			event.addCapability(key, new ModelData());
-	}
+	  public void attach(AttachCapabilitiesEvent<Entity> event) {
+	    if (event.getObject() instanceof EntityPlayer)
+	      event.addCapability(key, new ModelData());
+	  }
 }

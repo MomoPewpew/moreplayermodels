@@ -18,14 +18,14 @@ import noppes.mpm.constants.EnumAnimation;
 import noppes.mpm.constants.EnumPackets;
 
 public class ServerTickHandler {
-	
+
 	@SubscribeEvent
 	public void onPlayerTick(TickEvent.PlayerTickEvent event){
 		if(event.side == Side.CLIENT || event.phase == Phase.START)
 			return;
     	EntityPlayerMP player = (EntityPlayerMP) event.player;
     	ModelData data = ModelData.get(player);
-    	ItemStack item = player.inventory.mainInventory[0];
+    	ItemStack item = player.inventory.mainInventory.get(0);
     	if(data.backItem != item){
 	    	if(item == null){
 	    		Server.sendAssociatedData(player, EnumPackets.BACK_ITEM_REMOVE, player.getUniqueID());
@@ -43,7 +43,7 @@ public class ServerTickHandler {
     	data.prevPosY = player.posY;
     	data.prevPosZ = player.posZ;
 	}
-	
+
 	public static void checkAnimation(EntityPlayer player, ModelData data){
 		if(data.prevPosY <= 0 || player.ticksExisted < 40)
 			return;
@@ -59,8 +59,8 @@ public class ServerTickHandler {
 
     	if(player.isPlayerSleeping() || player.isRiding() || data.animationTime == 0  || data.animation == EnumAnimation.BOW && player.isSneaking())
     		data.setAnimation(EnumAnimation.NONE);
-    	    	
-    	if(!isJumping && player.isSneaking() && (data.animation == EnumAnimation.HUG || data.animation == EnumAnimation.CRAWLING || 
+
+    	if(!isJumping && player.isSneaking() && (data.animation == EnumAnimation.HUG || data.animation == EnumAnimation.CRAWLING ||
     			data.animation == EnumAnimation.SITTING || data.animation == EnumAnimation.DANCING))
     		return;
     	if(speed > 0.01 || isJumping || player.isPlayerSleeping() || player.isRiding() || data.isSleeping() && speed > 0.001)

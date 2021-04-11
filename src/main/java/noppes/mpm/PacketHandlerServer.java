@@ -18,7 +18,7 @@ public class PacketHandlerServer{
 		ByteBuf buf = event.getPacket().payload();
 		try {
 			handlePacket(buf, (EntityPlayerMP) player, EnumPackets.values()[buf.readInt()]);
-		
+
 		} catch (Exception e) {
 			LogWriter.except(e);
 		}
@@ -26,21 +26,21 @@ public class PacketHandlerServer{
 
 	private void handlePacket(ByteBuf buffer, EntityPlayerMP player, EnumPackets type) throws Exception {
 		if(type == EnumPackets.PING){
-			int version = buffer.readInt();			
+			int version = buffer.readInt();
 			if(version == MorePlayerModels.Version){
 				ModelData data = ModelData.get(player);
 				data.readFromNBT(Server.readNBT(buffer));
-				
+
 				if(!player.worldObj.getGameRules().getBoolean("mpmAllowEntityModels"))
 					data.entityClass = null;
-				
+
 				data.save();
 				Server.sendAssociatedData(player, EnumPackets.SEND_PLAYER_DATA, player.getUniqueID(), data.writeToNBT());
 			}
-			ItemStack back = player.inventory.mainInventory[0];
+			ItemStack back = player.inventory.mainInventory.get(0);
 			if(back != null)
 				Server.sendAssociatedData(player, EnumPackets.BACK_ITEM_UPDATE, player.getUniqueID(), back.writeToNBT(new NBTTagCompound()));
-			
+
 			Server.sendData(player, EnumPackets.PING, MorePlayerModels.Version);
 		}
 //		else if(type == EnumPackets.REQUEST_PLAYER_DATA){
@@ -61,7 +61,7 @@ public class PacketHandlerServer{
 		else if(type == EnumPackets.UPDATE_PLAYER_DATA){
 			ModelData data = ModelData.get(player);
 			data.readFromNBT(Server.readNBT(buffer));
-			
+
 			if(!player.worldObj.getGameRules().getBoolean("mpmAllowEntityModels"))
 				data.entityClass = null;
 			data.save();

@@ -8,6 +8,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import noppes.mpm.constants.EnumParts;
 
 
@@ -19,22 +21,22 @@ public class ModelDataShared{
 	public ModelPartConfig leg2 = new ModelPartConfig();
 	public ModelPartConfig head = new ModelPartConfig();
 
-	protected ModelPartData legParts = new ModelPartData("legs");	
+	protected ModelPartData legParts = new ModelPartData("legs");
 	public ModelEyeData eyes = new ModelEyeData();
-	
+
 	public Class<? extends EntityLivingBase> entityClass;
 	protected EntityLivingBase entity;
-	
+
 	public NBTTagCompound extra = new NBTTagCompound();
-	
+
 	protected HashMap<EnumParts, ModelPartData> parts = new HashMap<EnumParts, ModelPartData>();
-	
+
 	public int wingMode = 0; //0:do nothing, 1:wings show, 2:elytra shows
 
 	public String url = "";
 	public String displayName = "";
 	public String displayFormat = "";
-	
+
 	public NBTTagCompound writeToNBT(){
 		NBTTagCompound compound = new NBTTagCompound();
 
@@ -46,7 +48,7 @@ public class ModelDataShared{
 		compound.setTag("LegsConfig", leg1.writeToNBT());
 		compound.setTag("HeadConfig", head.writeToNBT());
 
-		compound.setTag("LegParts", legParts.writeToNBT());		
+		compound.setTag("LegParts", legParts.writeToNBT());
 		compound.setTag("Eyes", eyes.writeToNBT());
 		compound.setBoolean("EyesEnabled", eyes.isEnabled());
 
@@ -56,7 +58,7 @@ public class ModelDataShared{
 		compound.setString("CustomSkinUrl", url);
 		compound.setString("DisplayName", displayName);
 		compound.setString("DisplayDisplayFormat", displayFormat);
-		
+
 		NBTTagList list = new NBTTagList();
 		for(EnumParts e : parts.keySet()){
 			NBTTagCompound item = parts.get(e).writeToNBT();
@@ -64,29 +66,29 @@ public class ModelDataShared{
 			list.appendTag(item);
 		}
 		compound.setTag("Parts", list);
-		
+
 		return compound;
 	}
-	
+
 	public void readFromNBT(NBTTagCompound compound){
 		setEntityClass(compound.getString("EntityClass"));
-		
+
 		arm1.readFromNBT(compound.getCompoundTag("ArmsConfig"));
 		body.readFromNBT(compound.getCompoundTag("BodyConfig"));
 		leg1.readFromNBT(compound.getCompoundTag("LegsConfig"));
 		head.readFromNBT(compound.getCompoundTag("HeadConfig"));
 
-		legParts.readFromNBT(compound.getCompoundTag("LegParts"));		
+		legParts.readFromNBT(compound.getCompoundTag("LegParts"));
 		if(compound.hasKey("Eyes"))
 			eyes.readFromNBT(compound.getCompoundTag("Eyes"));
 
 		extra = compound.getCompoundTag("ExtraData");
 		wingMode = compound.getInteger("WingMode");
 
-		url = compound.getString("CustomSkinUrl");		
+		url = compound.getString("CustomSkinUrl");
 		displayName = compound.getString("DisplayName");
-		displayFormat = compound.getString("DisplayDisplayFormat");		
-				
+		displayFormat = compound.getString("DisplayDisplayFormat");
+
 		HashMap<EnumParts,ModelPartData> parts = new HashMap<EnumParts,ModelPartData>();
 		NBTTagList list = compound.getTagList("Parts", 10);
 		for (int i = 0; i < list.tagCount(); i++) {
@@ -143,38 +145,40 @@ public class ModelDataShared{
 	}
 
 	private void setEntityClass(String string) {
-		entityClass = null;
-		entity = null;
-
-        for(Class<? extends Entity> c : EntityList.NAME_TO_CLASS.values()){
-        	if(c.getCanonicalName().equals(string) && EntityLivingBase.class.isAssignableFrom(c)){
-            	entityClass = c.asSubclass(EntityLivingBase.class);
-            	break;
-        	}
-        }
+	    this.entityClass = null;
+	    this.entity = null;
+	    for (EntityEntry ent : ForgeRegistries.ENTITIES.getValues()) {
+	      try {
+	        Class<? extends Entity> c = ent.getEntityClass();
+	        if (c.getCanonicalName().equals(string) && EntityLivingBase.class.isAssignableFrom(c)) {
+	          this.entityClass = c.asSubclass(EntityLivingBase.class);
+	          break;
+	        }
+	      } catch (Exception exception) {}
+	    }
 	}
-	
+
 	public void setEntityClass(Class<? extends EntityLivingBase> entityClass){
 		this.entityClass = entityClass;
 		entity = null;
 		extra = new NBTTagCompound();
 	}
-	
+
 	public Class<? extends EntityLivingBase> getEntityClass(){
 		return entityClass;
 	}
-	
+
 	public float offsetY() {
 		if(entity == null)
 			return -getBodyY();
 		return entity.height - 1.8f;
 	}
-	
+
 	public void clearEntity() {
 		entity = null;
 	}
-	
-	
+
+
 	public ModelPartData getPartData(EnumParts type){
 		if(type == EnumParts.LEGS)
 			return legParts;
@@ -182,7 +186,7 @@ public class ModelDataShared{
 			return eyes;
 		return parts.get(type);
 	}
-	
+
 	public ModelPartConfig getPartConfig(EnumParts type){
     	if(type == EnumParts.BODY)
     		return body;
@@ -194,7 +198,7 @@ public class ModelDataShared{
     		return leg1;
     	if(type == EnumParts.LEG_RIGHT)
     		return leg2;
-    	
+
     	return head;
 	}
 
@@ -213,7 +217,7 @@ public class ModelDataShared{
 			parts.put(type, part = new ModelPartData(type.name));
 		return part;
 	}
-	
+
 	public float getBodyY(){
 //		if(legParts.type == 3)
 //			return (0.9f - body.scaleY) * 0.75f + getLegsY();

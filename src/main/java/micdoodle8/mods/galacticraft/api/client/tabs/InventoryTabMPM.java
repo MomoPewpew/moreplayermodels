@@ -18,7 +18,7 @@ import noppes.mpm.client.gui.GuiMPM;
 
 public class InventoryTabMPM extends AbstractTab {
 	private static final ModelPlayer biped = new ModelPlayer(0, true);
-	
+
 	public InventoryTabMPM() {
 		super(0, 0, 0, new ItemStack(Items.SKULL, 1, 3));
 		displayString = I18n.translateToLocal("menu.mpm");
@@ -39,15 +39,15 @@ public class InventoryTabMPM extends AbstractTab {
 	public boolean shouldAddToList() {
 		return true;
 	}
-	
+
 	@Override
-    public void drawButton(Minecraft minecraft, int mouseX, int mouseY){
+	public void drawButton(Minecraft minecraft, int mouseX, int mouseY, float partialTicks) {
         if (!visible){
-            super.drawButton(minecraft, mouseX, mouseY);
+            super.drawButton(minecraft, mouseX, mouseY, partialTicks);
             return;
         }
         this.renderStack = null;
-        
+
         if(enabled){
 	        Minecraft mc = Minecraft.getMinecraft();
 	        boolean hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
@@ -58,7 +58,7 @@ public class InventoryTabMPM extends AbstractTab {
 	        	GlStateManager.translate(-x, -(yPosition + 2), 0);
 	        }
         }
-        super.drawButton(minecraft, mouseX, mouseY);
+        super.drawButton(minecraft, mouseX, mouseY, partialTicks);
         GlStateManager.pushMatrix();
         GlStateManager.translate(xPosition + 14, (float)yPosition + 22, 150.0F);
         GlStateManager.scale(20, 20, 20);
@@ -84,7 +84,7 @@ public class InventoryTabMPM extends AbstractTab {
     protected void drawHoveringText(List list, int x, int y, FontRenderer font){
         if (list.isEmpty())
         	return;
-        
+
     	GlStateManager.disableRescaleNormal();
         RenderHelper.disableStandardItemLighting();
         GlStateManager.disableLighting();
